@@ -5,4 +5,4 @@ if __name__ == '__main__':
     # f.plot()
     f.plot_contours()
     # f.nelder_mead()
-    f.xxx()
+    # f.xxx()

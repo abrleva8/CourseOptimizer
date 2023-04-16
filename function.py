@@ -53,6 +53,8 @@ class Function:
         plt.show()
 
     def plot_contours(self):
+        self.nelder_mead()
+        points = self.triangle_points
         fig, ax = plt.subplots()
         x, y = self.limits()
         z = self.calculate((x, y))
@@ -61,7 +63,31 @@ class Function:
         ax.set_ylim(y.min(), y.max())
         cntr = ax.contourf(x, y, z, levels=20, cmap="RdBu_r")
         fig.colorbar(cntr, ax=ax)
-        plt.show()
+        points = self.triangle_points
+
+        def animate(i):
+            ax.clear()
+            # Get the point from the points list at index i
+            point = points[i]
+            triangle = np.array(point + point[:1])
+            ax.contour(x, y, z, levels=20, linewidths=0.5, colors='k')
+            # ax.set_xlim(-1, 10)
+            # ax.set_ylim(-1, 10)
+            ax.plot(triangle[:, 0], triangle[:, 1], marker='o')
+            cntr = ax.contourf(x, y, z, levels=20, cmap="RdBu_r")
+            # fig.colorbar(cntr, ax=ax)
+            ax.fill(triangle[:, 0], triangle[:, 1], color='yellow', alpha=0.3)
+            ax.set_xlim([0.99, 7.05])
+            ax.set_ylim([0.99, 7.05])
+
+        # fig, ax = plt.subplots(1, 1)
+        fig.set_size_inches(5, 5)
+
+        ani = FuncAnimation(fig, animate, frames=10, interval=500, repeat=False)
+        ani.save("simple_animation.gif", writer='PillowWriter')
+
+
+        # plt.show()
 
     def xxx(self):
         self.nelder_mead()
