@@ -52,6 +52,8 @@ class Function:
         fig.colorbar(surf, shrink=0.5, aspect=5)
         plt.show()
 
+    # TODO: try split animation and static
+    # also delete redundant functions
     def plot_contours(self):
         self.nelder_mead()
         points = self.triangle_points
