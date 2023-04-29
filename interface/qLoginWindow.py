@@ -40,9 +40,10 @@ class LoginWindow(QMainWindow):
         self.move(qr.topLeft())
 
     def _ok_clicked(self):
-        u_worker = UserWorker(self.label_login.text(), self.input_password.text())
+        u_worker = UserWorker(self.input_login.text(), self.input_password.text())
         try:
             u_worker.xxx()
+            print("aaa")
         except LoginException:
             dlg = qDialogInfo.QDialogInfo(self)
             dlg.setWindowTitle("Ошибка!!!")
