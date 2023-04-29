@@ -1,12 +1,12 @@
 from PyQt6 import QtGui
-from PyQt6.QtWidgets import QMainWindow, QLabel, QLineEdit, QPushButton
+from PyQt6.QtWidgets import QMainWindow, QLabel, QLineEdit, QPushButton, QMessageBox
 from PyQt6.QtGui import QFont
 
 from exceptions.loginException import LoginException
-from interface import qDialogInfo
 from logic.logic_test import UserWorker
 
 
+# TODO: добавить проверку на пустые inputs.
 class LoginWindow(QMainWindow):
     def __init__(self):
         super().__init__()
@@ -44,7 +44,8 @@ class LoginWindow(QMainWindow):
         try:
             u_worker.xxx()
             print("aaa")
-        except LoginException:
-            dlg = qDialogInfo.QDialogInfo(self)
-            dlg.setWindowTitle("Ошибка!!!")
+        except LoginException as le:
+            dlg = QMessageBox(self)
+            dlg.setWindowTitle("Ошибка!")
+            dlg.setText(str(le))
             dlg.exec()
