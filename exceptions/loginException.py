@@ -17,4 +17,4 @@ class BadPasswordException(LoginException):
         self.login = login
 
     def __str__(self):
-        return f"Неправильно виден пароль для пользователя {self.login}"
+        return f"Неправильно введен пароль для пользователя {self.login}"

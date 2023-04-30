@@ -1,4 +1,3 @@
-from PyQt6.QtCore import QSize, Qt
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QToolBar, QDialog
 from interface import qDialogInfo
