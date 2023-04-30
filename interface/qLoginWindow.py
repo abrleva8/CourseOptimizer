@@ -51,6 +51,8 @@ class LoginWindow(QMainWindow):
     def _input_text_changed(self, string):
         if string:
             self.ok_button.setEnabled(True)
+        else:
+            self.ok_button.setEnabled(False)
 
     def _ok_clicked(self):
         u_worker = UserWorker(self.input_login.text(), self.input_password.text())
