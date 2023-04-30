@@ -4,6 +4,7 @@ from PyQt6.QtGui import QFont
 
 from exceptions.loginException import LoginException
 from logic.logic_test import UserWorker
+from interface import MainWindow
 
 
 class LoginWindow(QMainWindow):
@@ -57,11 +58,20 @@ class LoginWindow(QMainWindow):
     def _ok_clicked(self):
         u_worker = UserWorker(self.input_login.text(), self.input_password.text())
         try:
-            u_worker.xxx()
-            print("aaa")
+            login = u_worker.get_login()
         except LoginException as le:
             dlg = QMessageBox(self)
             dlg.setWindowTitle("Ошибка!")
             dlg.setIcon(QMessageBox.Icon.Critical)
             dlg.setText(str(le))
             dlg.exec()
+            return
+
+        match login:
+            case 'adminl':
+                self.main_window = MainWindow()
+                self.main_window.show()
+                self.close()
+                print(2)
+            case 'loginl':
+                pass

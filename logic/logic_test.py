@@ -6,7 +6,7 @@ class UserWorker:
     def __init__(self, login, password):
         self.user = User(login, password)
 
-    def xxx(self):
+    def get_login(self):
         try:
             res = self.user.get_data()
         except loginException.LoginException as e:

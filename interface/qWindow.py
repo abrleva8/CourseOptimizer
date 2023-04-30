@@ -1,11 +1,11 @@
 from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QApplication, QMainWindow, QPushButton, QToolBar, QDialog
+from PyQt6.QtWidgets import QMainWindow, QToolBar, QWidget, QDialog
 from interface import qDialogInfo
 
 
 class MainWindow(QMainWindow):
     def __init__(self):
-        super().__init__()
+        super(MainWindow, self).__init__()
 
         self.setWindowTitle("Курсовая работа, 1 вариант")
         self.resize(1000, 700)
@@ -23,4 +23,3 @@ class MainWindow(QMainWindow):
         dlg = qDialogInfo.QDialogInfo(self)
         dlg.setWindowTitle("Формулировка задачи")
         dlg.exec()
-        # print("click", s)
