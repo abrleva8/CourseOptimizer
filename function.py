@@ -88,7 +88,6 @@ class Function:
         ani = FuncAnimation(fig, animate, frames=10, interval=500, repeat=False)
         ani.save("simple_animation.gif", writer='PillowWriter')
 
-
         # plt.show()
 
     def xxx(self):

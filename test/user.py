@@ -18,4 +18,3 @@ class User:
                         return self.login
             raise loginException.NotSuchUserException(self.login)
 
-# User("", "")
