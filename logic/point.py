@@ -29,4 +29,3 @@ class Point(object):
 
     def tuple_from_data(self):
         return self.x, self.y
-

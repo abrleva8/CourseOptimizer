@@ -3,7 +3,7 @@ from PyQt6.QtWidgets import QMainWindow, QLabel, QLineEdit, QPushButton, QMessag
 from PyQt6.QtGui import QFont
 
 from exceptions.loginException import LoginException
-from logic.logic_test import UserWorker
+from logic.user_worker import UserWorker
 from interface import MainWindow
 
 
@@ -72,6 +72,5 @@ class LoginWindow(QMainWindow):
                 self.main_window = MainWindow()
                 self.main_window.show()
                 self.close()
-                print(2)
             case 'loginl':
                 pass

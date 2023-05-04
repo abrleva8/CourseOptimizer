@@ -13,5 +13,3 @@ class UserWorker:
             raise e
 
         return res
-
-
