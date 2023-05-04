@@ -48,7 +48,6 @@ class MainWindow(QMainWindow):
         self.x, self.y = f.limits()
         self.z = f.calculate((self.x, self.y))
         self.points = f.triangle_points
-        point_0 = self.points[0]
 
         self.timer = QtCore.QTimer()
         self.timer.setInterval(1000)
@@ -61,7 +60,7 @@ class MainWindow(QMainWindow):
     def update_plot(self):
         points = self.points
         self.i += 1
-        if self.i > 6:
+        if self.i >= len(self.points):
             self.i = 0
         point_0 = points[self.i]
         # self.ydata = self.ydata[1:] + [random.randint(0, 10)]
