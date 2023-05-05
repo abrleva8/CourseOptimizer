@@ -3,8 +3,8 @@ from PyQt6.QtWidgets import QMainWindow, QLabel, QLineEdit, QPushButton, QMessag
 from PyQt6.QtGui import QFont
 
 from exceptions import LoginException
-from logic.user_worker import UserWorker
 from interface import MainWindow
+from logic import UserWorker
 
 
 class LoginWindow(QMainWindow):

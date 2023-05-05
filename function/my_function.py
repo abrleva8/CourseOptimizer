@@ -1,6 +1,6 @@
 import numpy as np
 
-from logic import point
+from function import point
 
 
 class Function:

@@ -5,7 +5,7 @@ from matplotlib.figure import Figure
 
 class MplCanvas(FigureCanvasQTAgg):
 
-    def __init__(self, parent=None, width=5, height=4, dpi=400):
+    def __init__(self, width=5, height=4, dpi=400):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
         self.gs = gridspec.GridSpec(1, 2)
         self.ax_1 = self.fig.add_subplot(self.gs[0])
