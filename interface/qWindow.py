@@ -9,6 +9,7 @@ from matplotlib.backends.backend_qtagg import FigureCanvasQTAgg
 from interface import qDialogInfo
 from logic import my_function
 from matplotlib.figure import Figure
+from matplotlib import gridspec
 
 import matplotlib
 
@@ -19,7 +20,11 @@ class MplCanvas(FigureCanvasQTAgg):
 
     def __init__(self, parent=None, width=5, height=4, dpi=400):
         self.fig = Figure(figsize=(width, height), dpi=dpi)
-        self.axes = self.fig.add_subplot(121)
+        self.gs = gridspec.GridSpec(1, 2)
+        self.ax_1 = self.fig.add_subplot(self.gs[0])
+        self.ax_2 = self.fig.add_subplot(self.gs[1])
+        self.cbar = None
+        # self.ax_3 = self.fig.add_subplot(self.gs[2])
         super(MplCanvas, self).__init__(self.fig)
 
 
@@ -63,21 +68,19 @@ class MainWindow(QMainWindow):
         if self.i >= len(self.points):
             self.i = 0
         point_0 = points[self.i]
-        # self.ydata = self.ydata[1:] + [random.randint(0, 10)]
-        self.canvas.axes.cla()  # Clear the canvas.
-        # self.canvas.figure.remove()
-        self.canvas.axes.set_xlim([0.99, 7.05])
-        self.canvas.axes.set_ylim([0.99, 7.05])
 
-        self.canvas.axes.contour(self.x, self.y, self.z, levels=20, linewidths=0.5, colors='k')
-        cntr = self.canvas.axes.contourf(self.x, self.y, self.z, levels=20, cmap="RdBu_r")
-        # TODO: подумать как убрать костыль
-        if not cntr:
-            self.canvas.fig.colorbar(cntr, ax=self.canvas.axes, use_gridspec=False)
-        # self.canvas.fig.colorbar(cntr, ax=self.canvas.axes, use_gridspec=None)
-        self.canvas.axes.plot([point_0[0][0], point_0[1][0], point_0[2][0], point_0[0][0]],
+        self.canvas.ax_1.clear()  # Clear the canvas.
+        if self.canvas.cbar:
+            self.canvas.cbar.remove()
+
+        self.canvas.ax_1.set_xlim([0.99, 7.05])
+        self.canvas.ax_1.set_ylim([0.99, 7.05])
+        cntr = self.canvas.ax_1.contourf(self.x, self.y, self.z, levels=50, cmap='RdGy')
+        self.canvas.cbar = self.canvas.fig.colorbar(cntr)
+
+        self.canvas.ax_1.plot([point_0[0][0], point_0[1][0], point_0[2][0], point_0[0][0]],
                               [point_0[0][1], point_0[1][1], point_0[2][1], point_0[0][1]], color='red')
-        # Trigger the canvas to update and redraw.
+
         self.canvas.draw()
 
     def _open_dialog_info(self, s):
