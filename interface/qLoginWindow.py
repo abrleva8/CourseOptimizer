@@ -2,7 +2,7 @@ from PyQt6 import QtGui
 from PyQt6.QtWidgets import QMainWindow, QLabel, QLineEdit, QPushButton, QMessageBox
 from PyQt6.QtGui import QFont
 
-from exceptions.loginException import LoginException
+from exceptions import LoginException
 from logic.user_worker import UserWorker
 from interface import MainWindow
 

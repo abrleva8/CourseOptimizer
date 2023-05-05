@@ -1,6 +1,8 @@
-from interface import qWindow, qLoginWindow
-from PyQt6.QtWidgets import QApplication
 import sys
+
+from PyQt6.QtWidgets import QApplication
+
+from interface import qLoginWindow
 
 if __name__ == '__main__':
     # f = Function()
