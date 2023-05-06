@@ -25,6 +25,6 @@ class QDialogInfo(QDialog):
 
         self.setWindowTitle("Информация")
         self.resize(500, 350)
-        self.label_password = QLabel(text, self)
-        self.label_password.setWordWrap(True)
-        self.label_password.move(10, 10)
+        self.program_info = QLabel(text, self)
+        self.program_info.setWordWrap(True)
+        self.program_info.move(10, 10)

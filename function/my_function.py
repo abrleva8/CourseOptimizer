@@ -35,7 +35,7 @@ class Function:
         y = np.ma.masked_array(y, ~mask)
         return x, y
 
-    def nelder_mead(self, alpha=1, beta=0.5, gamma=2, max_iter=10):
+    def nelder_mead(self, alpha=1, beta=0.5, gamma=2, max_iter=10) -> point:
         self.triangle_points = []
         v1 = point.Point(7, 1)
         v2 = point.Point(1, 7)

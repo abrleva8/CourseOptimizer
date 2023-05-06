@@ -5,7 +5,7 @@ class Point(object):
         self.y = y
 
     def __repr__(self):
-        return "({0}, {1})".format(self.x, self.y)
+        return f"({self.x:.2f}, {self.y:.2f})"
 
     def __add__(self, other):
         x = self.x + other.x

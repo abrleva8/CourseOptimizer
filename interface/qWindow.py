@@ -1,8 +1,8 @@
 import sys
 
 from PyQt6 import QtCore
-from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QGridLayout
+from PyQt6.QtGui import QAction, QFont
+from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QGridLayout, QLabel
 from PyQt6.QtWidgets import QToolBar
 
 from interface import qDialogInfo
@@ -27,7 +27,8 @@ class MainWindow(QMainWindow):
         # TODO: сделать рефакторинг
         self.i = 0
         self.f = my_function.Function()
-        self.f.nelder_mead()
+        self.min_point = self.f.nelder_mead()
+        self.min_point_z = self.f.calculate((self.min_point.x, self.min_point.y))
 
         self.x, self.y = self.f.limits()
         self.z = self.f.calculate((self.x, self.y))
@@ -46,15 +47,23 @@ class MainWindow(QMainWindow):
         toolbar.addAction(button_action)
 
         self.ok_button = QPushButton("Нарисовать графики", self)
-        # self.ok_button.move(150, 150)
         self.ok_button.clicked.connect(self._start_clicked)
         self.ok_button.setEnabled(True)
 
-        self.canvas = MplCanvas(width=5, height=4, dpi=100)
+        self.founded_optimum_point = QLabel("Точка минимума: ", self)
+        self.founded_optimum_value = QLabel("Найденный минимум: ", self)
+        # self.founded_optimum.move(90, 90)
+        # self.founded_optimum.setFont(QFont("Sanserif", 15))
+
+        self.canvas = MplCanvas(width=4, height=4, dpi=100)
 
         layout = QGridLayout()
+        # layout.setRowStretch(0, 3)
+        # layout.setRowStretch(0, 25)
         layout.addWidget(self.ok_button, 0, 0)
-        layout.addWidget(self.canvas, 0, 1, 6, 5)
+        layout.addWidget(self.founded_optimum_point, 1, 0)
+        layout.addWidget(self.founded_optimum_value, 2, 0)
+        layout.addWidget(self.canvas, 0, 10, 0, 9)
 
         widget = QWidget()
         widget.setLayout(layout)
@@ -74,6 +83,7 @@ class MainWindow(QMainWindow):
 
         self.canvas.ax_1.set_xlim([0.99, 7.05])
         self.canvas.ax_1.set_ylim([0.99, 7.05])
+        self.canvas.ax_1.plot(self.min_point.x, self.min_point.y, color='gray', marker='o')
         cntr = self.canvas.ax_1.contourf(self.x, self.y, self.z, levels=50, cmap='RdGy')
         self.canvas.cbar = self.canvas.fig.colorbar(cntr)
 
@@ -85,8 +95,10 @@ class MainWindow(QMainWindow):
     def plot_3d(self):
         if self.canvas.cbar_2:
             self.canvas.cbar_2.remove()
-        surf = self.canvas.ax_2.plot_surface(self.x, self.y, self.z, cmap=cm.coolwarm, linewidth=0, antialiased=True)
+        surf = self.canvas.ax_2.plot_surface(self.x, self.y, self.z, cmap=cm.coolwarm, antialiased=True)
         self.canvas.ax_2.set_zlim(self.z.min(), self.z.max())
+
+        self.canvas.ax_2.scatter(self.min_point.x, self.min_point.y, self.min_point_z, color='black', marker='o')
         self.canvas.ax_2.set_xlim(self.x.min(), self.x.max())
         self.canvas.ax_2.set_ylim(self.y.min(), self.y.max())
         self.canvas.cbar_2 = self.canvas.fig.colorbar(surf, fraction=0.046, pad=0.04)
@@ -104,6 +116,8 @@ class MainWindow(QMainWindow):
 
         self.update_plot()
         self.plot_3d()
+        self.founded_optimum_point.setText('Точка минимума: ' + repr(self.min_point))
+        self.founded_optimum_value.setText(f'Найденный минимум: {self.min_point_z:.2}')
 
 
 if __name__ == '__main__':
