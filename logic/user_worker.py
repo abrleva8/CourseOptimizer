@@ -1,5 +1,5 @@
 from exceptions import loginException
-from test.user import User
+from users.user import User
 
 
 class UserWorker:

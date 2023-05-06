@@ -8,6 +8,7 @@ from PyQt6.QtWidgets import QToolBar
 from interface import qDialogInfo
 from function import my_function
 from matplotlib import cm
+from logic import Optimizer
 
 import matplotlib
 
@@ -26,14 +27,8 @@ class MainWindow(QMainWindow):
 
         # TODO: сделать рефакторинг
         self.i = 0
-        self.f = my_function.Function()
-        self.min_point = self.f.nelder_mead()
-        self.min_point_z = self.f.calculate((self.min_point.x, self.min_point.y))
 
-        self.x, self.y = self.f.limits()
-        self.z = self.f.calculate((self.x, self.y))
-        self.points = self.f.triangle_points
-
+        self.optimizer = Optimizer()
         self.show()
 
     def _add_components(self):
@@ -52,14 +47,10 @@ class MainWindow(QMainWindow):
 
         self.founded_optimum_point = QLabel("Точка минимума: ", self)
         self.founded_optimum_value = QLabel("Найденный минимум: ", self)
-        # self.founded_optimum.move(90, 90)
-        # self.founded_optimum.setFont(QFont("Sanserif", 15))
 
         self.canvas = MplCanvas(width=4, height=4, dpi=100)
 
         layout = QGridLayout()
-        # layout.setRowStretch(0, 3)
-        # layout.setRowStretch(0, 25)
         layout.addWidget(self.ok_button, 0, 0)
         layout.addWidget(self.founded_optimum_point, 1, 0)
         layout.addWidget(self.founded_optimum_value, 2, 0)
@@ -71,9 +62,9 @@ class MainWindow(QMainWindow):
         self.setCentralWidget(widget)
 
     def update_plot(self):
-        points = self.points
+        points = self.optimizer.get_points()
         self.i += 1
-        if self.i >= len(self.points):
+        if self.i >= len(points):
             self.i = 0
         point_current = points[self.i]
 
@@ -81,10 +72,10 @@ class MainWindow(QMainWindow):
         if self.canvas.cbar:
             self.canvas.cbar.remove()
 
-        self.canvas.ax_1.set_xlim([0.99, 7.05])
-        self.canvas.ax_1.set_ylim([0.99, 7.05])
-        self.canvas.ax_1.plot(self.min_point.x, self.min_point.y, color='gray', marker='o')
-        cntr = self.canvas.ax_1.contourf(self.x, self.y, self.z, levels=50, cmap='RdGy')
+        self.canvas.ax_1.set_xlim(self.optimizer.get_x_min_max())
+        self.canvas.ax_1.set_ylim(self.optimizer.get_y_min_max())
+        self.canvas.ax_1.plot(self.optimizer.get_min_point().x, self.optimizer.get_min_point().y, color='gray', marker='o')
+        cntr = self.canvas.ax_1.contourf(*self.optimizer.get_limits(), levels=50, cmap='RdGy')
         self.canvas.cbar = self.canvas.fig.colorbar(cntr)
 
         self.canvas.ax_1.plot([point_current[0][0], point_current[1][0], point_current[2][0], point_current[0][0]],
@@ -95,12 +86,13 @@ class MainWindow(QMainWindow):
     def plot_3d(self):
         if self.canvas.cbar_2:
             self.canvas.cbar_2.remove()
-        surf = self.canvas.ax_2.plot_surface(self.x, self.y, self.z, cmap=cm.coolwarm, antialiased=True)
-        self.canvas.ax_2.set_zlim(self.z.min(), self.z.max())
+        surf = self.canvas.ax_2.plot_surface(*self.optimizer.get_limits(), cmap=cm.coolwarm, antialiased=True)
+        self.canvas.ax_2.set_zlim(self.optimizer.get_z_min_max())
 
-        self.canvas.ax_2.scatter(self.min_point.x, self.min_point.y, self.min_point_z, color='black', marker='o')
-        self.canvas.ax_2.set_xlim(self.x.min(), self.x.max())
-        self.canvas.ax_2.set_ylim(self.y.min(), self.y.max())
+        self.canvas.ax_2.scatter(self.optimizer.get_min_point().x, self.optimizer.get_min_point().y,
+                                 self.optimizer.get_min_value(), color='black', marker='o')
+        self.canvas.ax_2.set_xlim(self.optimizer.get_x_min_max())
+        self.canvas.ax_2.set_ylim(self.optimizer.get_y_min_max())
         self.canvas.cbar_2 = self.canvas.fig.colorbar(surf, fraction=0.046, pad=0.04)
 
     def _open_dialog_info(self):
@@ -116,8 +108,8 @@ class MainWindow(QMainWindow):
 
         self.update_plot()
         self.plot_3d()
-        self.founded_optimum_point.setText('Точка минимума: ' + repr(self.min_point))
-        self.founded_optimum_value.setText(f'Найденный минимум: {self.min_point_z:.2}')
+        self.founded_optimum_point.setText('Точка минимума: ' + repr(self.optimizer.get_min_point()))
+        self.founded_optimum_value.setText(f'Найденный минимум: {self.optimizer.get_min_value():.2}')
 
 
 if __name__ == '__main__':

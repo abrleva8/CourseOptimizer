@@ -7,7 +7,7 @@ class User:
         self.password = password
 
     def get_data(self):
-        with open('C:\\Users\\abrle\\PycharmProjects\\CourseOptimizer\\test\\1.txt', 'r') as f:
+        with open('users\\1.txt', 'r') as f:
             lines = f.readlines()
             for line in lines[1:]:
                 login, password = map(str.rstrip, line.split(','))
