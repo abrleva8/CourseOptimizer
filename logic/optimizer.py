@@ -2,12 +2,12 @@ from function import Function
 
 
 class Optimizer:
-    def __init__(self):
+    def __init__(self, max_iter=10):
         self.f = Function()
-        self._start()
+        self._start(max_iter)
 
-    def _start(self):
-        self.__min_point = self.f.nelder_mead()
+    def _start(self, max_iter):
+        self.__min_point = self.f.nelder_mead(max_iter=max_iter)
         self.__min_value = self.f.calculate((self.__min_point.x, self.__min_point.y))
         self.__x_limits, self.__y_limits = self.f.limits()
         self.__z_limits = self.f.calculate((self.__x_limits, self.__y_limits))

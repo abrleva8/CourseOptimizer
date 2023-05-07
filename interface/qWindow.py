@@ -2,7 +2,8 @@ import sys
 
 from PyQt6 import QtCore
 from PyQt6.QtGui import QAction, QFont
-from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QGridLayout, QLabel
+from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QGridLayout, QLabel, QVBoxLayout, \
+    QHBoxLayout, QLineEdit
 from PyQt6.QtWidgets import QToolBar
 
 from interface import qDialogInfo
@@ -41,6 +42,12 @@ class MainWindow(QMainWindow):
         button_action.triggered.connect(self._open_dialog_info)
         toolbar.addAction(button_action)
 
+        self.label_count_iteration = QLabel("Число итерации")
+
+        self.input_count_iteration = QLineEdit("10")
+        self.input_count_iteration.setPlaceholderText('Введите число итерации')
+        self.input_count_iteration.setInputMask("00")
+
         self.ok_button = QPushButton("Нарисовать графики", self)
         self.ok_button.clicked.connect(self._start_clicked)
         self.ok_button.setEnabled(True)
@@ -50,14 +57,22 @@ class MainWindow(QMainWindow):
 
         self.canvas = MplCanvas(width=4, height=4, dpi=100)
 
-        layout = QGridLayout()
-        layout.addWidget(self.ok_button, 0, 0)
-        layout.addWidget(self.founded_optimum_point, 1, 0)
-        layout.addWidget(self.founded_optimum_value, 2, 0)
-        layout.addWidget(self.canvas, 0, 10, 0, 9)
+        layout_t = QHBoxLayout(self)
+
+        layout_left = QGridLayout()
+        layout_right = QGridLayout()
+        layout_left.addWidget(self.label_count_iteration, 0, 0)
+        layout_left.addWidget(self.input_count_iteration, 0, 1)
+        layout_left.addWidget(self.ok_button, 1, 0)
+        layout_left.addWidget(self.founded_optimum_point, 2, 0)
+        layout_left.addWidget(self.founded_optimum_value, 3, 0)
+        layout_right.addWidget(self.canvas)
+
+        layout_t.addLayout(layout_left, 0)
+        layout_t.addLayout(layout_right, 1)
 
         widget = QWidget()
-        widget.setLayout(layout)
+        widget.setLayout(layout_t)
 
         self.setCentralWidget(widget)
 
@@ -74,12 +89,14 @@ class MainWindow(QMainWindow):
 
         self.canvas.ax_1.set_xlim(self.optimizer.get_x_min_max())
         self.canvas.ax_1.set_ylim(self.optimizer.get_y_min_max())
-        self.canvas.ax_1.plot(self.optimizer.get_min_point().x, self.optimizer.get_min_point().y, color='gray', marker='o')
+        self.canvas.ax_1.plot(self.optimizer.get_min_point().x, self.optimizer.get_min_point().y,
+                              color='gray', marker='o')
         cntr = self.canvas.ax_1.contourf(*self.optimizer.get_limits(), levels=50, cmap='RdGy')
         self.canvas.cbar = self.canvas.fig.colorbar(cntr)
 
         self.canvas.ax_1.plot([point_current[0][0], point_current[1][0], point_current[2][0], point_current[0][0]],
-                              [point_current[0][1], point_current[1][1], point_current[2][1], point_current[0][1]], color='red')
+                              [point_current[0][1], point_current[1][1], point_current[2][1], point_current[0][1]],
+                              color='red')
 
         self.canvas.draw()
 
@@ -106,10 +123,15 @@ class MainWindow(QMainWindow):
         self.timer.timeout.connect(self.update_plot)
         self.timer.start()
 
+        count_iteration = self._get_count_iteration()
+        self.optimizer = Optimizer(max_iter=count_iteration)
         self.update_plot()
         self.plot_3d()
         self.founded_optimum_point.setText('Точка минимума: ' + repr(self.optimizer.get_min_point()))
         self.founded_optimum_value.setText(f'Найденный минимум: {self.optimizer.get_min_value():.2}')
+
+    def _get_count_iteration(self):
+        return int(self.input_count_iteration.text())
 
 
 if __name__ == '__main__':
