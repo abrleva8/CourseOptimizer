@@ -17,4 +17,3 @@ class User:
                     else:
                         return self.login
             raise loginException.NotSuchUserException(self.login)
-
