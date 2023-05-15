@@ -10,6 +10,6 @@ class MplCanvas(FigureCanvasQTAgg):
         self.gs = gridspec.GridSpec(1, 2)
         self.ax_1 = self.fig.add_subplot(self.gs[0])
         self.ax_2 = self.fig.add_subplot(self.gs[1], projection='3d')
-        self.cbar = None
+        self.cbar_1 = None
         self.cbar_2 = None
         super(MplCanvas, self).__init__(self.fig)

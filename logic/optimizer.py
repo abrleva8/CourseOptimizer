@@ -2,7 +2,16 @@ from function import Function
 
 
 class Optimizer:
-    def __init__(self, max_iter=10):
+    """
+    Class for optimize current function in the project
+    """
+    def __init__(self, max_iter: int = 10):
+        """
+        Parameters
+        ----------
+        max_iter : int
+            The maximum of iteration. Should be positive number
+        """
         self.f = Function()
         self._start(max_iter)
 
