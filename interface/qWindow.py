@@ -18,12 +18,14 @@ class MainWindow(QMainWindow):
     def __init__(self):
         super(MainWindow, self).__init__()
 
+        # TODO: сделать рефакторинг: вынести графики в отдельный модуль
+        self.minimum_point_3d = None
+
         self.setWindowTitle("Курсовая работа, 1 вариант")
         self.showMaximized()
         self._add_components()
 
         # TODO: сделать рефакторинг
-        # TODO: подписать графики
         self.i = 0
 
         self.optimizer = Optimizer()
@@ -95,13 +97,15 @@ class MainWindow(QMainWindow):
         self.canvas.ax_1.set_ylabel('Компонента A2')
         self.canvas.ax_1.set_title('График линии равных значений объема расхода компонентов')
         self.canvas.ax_1.plot(self.optimizer.get_min_point().x, self.optimizer.get_min_point().y,
-                              color='gray', marker='o')
+                              color='gray', marker='o', label='Найденный минимум')
         cntr = self.canvas.ax_1.contourf(*self.optimizer.get_limits(), levels=50, cmap=cm.coolwarm)
         self.canvas.cbar_1 = self.canvas.fig.colorbar(cntr)
 
         self.canvas.ax_1.plot([point_current[0][0], point_current[1][0], point_current[2][0], point_current[0][0]],
                               [point_current[0][1], point_current[1][1], point_current[2][1], point_current[0][1]],
-                              color='red')
+                              color='red', label='Текущая итерация (симплекс)')
+
+        self.canvas.ax_1.legend()
 
         self.canvas.draw()
 
@@ -111,14 +115,21 @@ class MainWindow(QMainWindow):
         surf = self.canvas.ax_2.plot_surface(*self.optimizer.get_limits(), cmap=cm.coolwarm, antialiased=True)
         self.canvas.ax_2.set_zlim(self.optimizer.get_z_min_max())
 
-        self.canvas.ax_2.scatter(self.optimizer.get_min_point().x, self.optimizer.get_min_point().y,
-                                 self.optimizer.get_min_value(), color='black', marker='o')
+        if self.minimum_point_3d:
+            self.minimum_point_3d.remove()
+
+        self.minimum_point_3d = self.canvas.ax_2.scatter(
+            self.optimizer.get_min_point().x, self.optimizer.get_min_point().y, self.optimizer.get_min_value(),
+            color='black', marker='o', label='Найденный минимум')
+
         self.canvas.ax_2.set_xlim(self.optimizer.get_x_min_max())
         self.canvas.ax_2.set_ylim(self.optimizer.get_y_min_max())
         self.canvas.ax_2.set_title('График зависимости объема расхода от компонентов A1 и A2')
         self.canvas.ax_2.set_xlabel('Компонент A1')
         self.canvas.ax_2.set_ylabel('Компонент A2')
         self.canvas.ax_2.set_zlabel('Расход компонента за смену')
+        self.canvas.ax_2.legend()
+
         self.canvas.cbar_2 = self.canvas.fig.colorbar(surf, fraction=0.03, pad=0.1)
         self.canvas.draw()
 
