@@ -4,8 +4,8 @@ from PyQt6 import QtGui
 from PyQt6.QtCore import Qt
 from PyQt6.QtWidgets import QLabel, QLineEdit, QPushButton, QMessageBox, QGridLayout, QApplication, QWidget
 
+import interface
 from exceptions import LoginException
-from interface import qWindow
 from logic import UserWorker
 
 
@@ -71,11 +71,14 @@ class LoginWindow(QWidget):
 
         match login:
             case 'adminl':
-                self.main_window = qWindow.MainWindow()
+                self.main_window = interface.AdminWindow()
                 self.main_window.show()
                 self.close()
-            case 'loginl':
                 pass
+            case 'studl':
+                self.main_window = interface.UserWindow()
+                self.main_window.show()
+                self.close()
 
 
 if __name__ == '__main__':

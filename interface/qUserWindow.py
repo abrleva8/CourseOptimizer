@@ -14,9 +14,9 @@ from plotting.mpl_canvas import MplCanvas
 matplotlib.use('QtAgg')
 
 
-class MainWindow(QMainWindow):
+class UserWindow(QMainWindow):
     def __init__(self):
-        super(MainWindow, self).__init__()
+        super(UserWindow, self).__init__()
 
         # TODO: сделать рефакторинг: вынести графики в отдельный модуль
         self.minimum_point_3d = None
@@ -143,6 +143,9 @@ class MainWindow(QMainWindow):
         self.login_window.show()
         self.close()
 
+    # TODO: добавить формализированное описание задания
+    # TODO: симплекс метод - добавить методов
+    
     def _start_clicked(self):
         self.timer = QtCore.QTimer()
         self.timer.setInterval(1000)
@@ -162,7 +165,7 @@ class MainWindow(QMainWindow):
 
 if __name__ == '__main__':
     app = QApplication(sys.argv)
-    window = MainWindow()
+    window = UserWindow()
     window.show()
 
     app.exec()

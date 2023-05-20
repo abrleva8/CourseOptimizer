@@ -1,3 +1,4 @@
-from .qDialogInfo import *
-from .qWindow import *
-from .qLoginWindow import *
+from qDialogInfo import *
+from qUserWindow import *
+from qLoginWindow import *
+from qAdminWindow import *
