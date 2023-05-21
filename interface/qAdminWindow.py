@@ -1,11 +1,14 @@
 import sys
 
 from PyQt6.QtCore import QStringListModel
-from PyQt6.QtWidgets import QWidget, QApplication, QComboBox, QPushButton, QGridLayout, QLineEdit, QMessageBox
+from PyQt6.QtGui import QAction
+from PyQt6.QtWidgets import QWidget, QApplication, QComboBox, QPushButton, QGridLayout, QLineEdit, QMessageBox, \
+    QToolBar, QMainWindow, QSizePolicy
 from PyQt6 import QtGui
 
 import logic
 from exceptions import AdminException
+from interface import qLoginWindow
 
 
 class AdminWindow(QWidget):
@@ -14,6 +17,13 @@ class AdminWindow(QWidget):
         self.setWindowTitle("Окно администратора")
         self.admin_worker = logic.AdminWorker()
         self.setFixedSize(300, 150)
+
+        self.toolbar = QToolBar("d", self)
+
+        button_action = QAction("Сменить пользователя", self)
+        button_action.setToolTip("Смена пользователя")
+        button_action.triggered.connect(self._change_user)
+        self.toolbar.addAction(button_action)
 
         layout = self._get_layout()
         self.setLayout(layout)
@@ -55,6 +65,11 @@ class AdminWindow(QWidget):
         cp = QtGui.QGuiApplication.primaryScreen().availableGeometry().center()
         qr.moveCenter(cp)
         self.move(qr.topLeft())
+
+    def _change_user(self):
+        self.login_window = qLoginWindow.LoginWindow()
+        self.login_window.show()
+        self.close()
 
     def _init_methods_combo_box(self):
         list_of_methods = self.admin_worker.get_methods()

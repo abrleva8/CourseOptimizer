@@ -97,7 +97,7 @@ class UserWindow(QMainWindow):
         self.canvas.ax_1.set_ylabel('Компонента A2')
         self.canvas.ax_1.set_title('График линии равных значений объема расхода компонентов')
         self.canvas.ax_1.plot(self.optimizer.get_min_point().x, self.optimizer.get_min_point().y,
-                              color='gray', marker='o', label='Найденный минимум')
+                              color='gray', marker='o', label='Найденный максимум')
         cntr = self.canvas.ax_1.contourf(*self.optimizer.get_limits(), levels=50, cmap=cm.coolwarm)
         self.canvas.cbar_1 = self.canvas.fig.colorbar(cntr)
 

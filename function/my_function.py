@@ -23,8 +23,17 @@ class Function:
 
     def calculate(self, point):
         a1, a2 = point
-        return self.alpha * (a1 ** 2 + self.beta * a2 - self.mu * self.v_1) ** self.N + \
-            self.alpha_1 * (self.beta_1 * a1 + a2 ** 2 - self.mu_1 * self.v_2) ** self.N
+        try:
+            if 1 > a1 or a1 > 10:
+                return 1e10
+            if 1 > a2 or a2 > 10:
+                return 1e10
+            if a1 + a2 > 8:
+                return 1e10
+        except:
+            pass
+        return -(self.alpha * (a1 ** 2 + self.beta * a2 - self.mu * self.v_1) ** self.N +
+                 self.alpha_1 * (self.beta_1 * a1 + a2 ** 2 - self.mu_1 * self.v_2) ** self.N)
 
     def limits(self):
         x = np.arange(self.min_a1, self.max_a1, 0.25)
@@ -35,11 +44,11 @@ class Function:
         y = np.ma.masked_array(y, ~mask)
         return x, y
 
-    def nelder_mead(self, alpha=1, beta=0.5, gamma=2, max_iter=10) -> point:
+    def nelder_mead(self, alpha=0.5, beta=0.2, gamma=2, max_iter=10) -> point:
         self.triangle_points = []
-        v1 = point.Point(7, 1)
-        v2 = point.Point(1, 7)
-        v3 = point.Point(3, 4)
+        v1 = point.Point(1.4, 4)
+        v2 = point.Point(2, 2)
+        v3 = point.Point(1.5, 2)
         self.triangle_points.append([v1.tuple_from_data(), v2.tuple_from_data(), v3.tuple_from_data()])
 
         for i in range(max_iter):
