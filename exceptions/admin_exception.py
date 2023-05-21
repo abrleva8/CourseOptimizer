@@ -14,4 +14,4 @@ class SameMethodException(AdminException):
         self.name = name
 
     def __str__(self):
-        return f"Метод {self.name} уже есть в базе!"
+        return f"Метод `{self.name}` уже есть в базе!"

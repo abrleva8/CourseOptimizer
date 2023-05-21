@@ -1,5 +1,6 @@
 import sys
 
+from PyQt6.QtCore import QStringListModel
 from PyQt6.QtWidgets import QWidget, QApplication, QComboBox, QPushButton, QGridLayout, QLineEdit, QMessageBox
 from PyQt6 import QtGui
 
@@ -25,6 +26,8 @@ class AdminWindow(QWidget):
         layout = QGridLayout()
 
         self.methods_combo_box = QComboBox(self)
+        self.method_cb_model = QStringListModel()
+        self.methods_combo_box.setModel(self.method_cb_model)
         self.methods_combo_box.currentTextChanged.connect(self._methods_combo_box_changed)
         layout.addWidget(self.methods_combo_box, 0, 0)
 
@@ -61,18 +64,24 @@ class AdminWindow(QWidget):
 
     def _add_button_clicked(self):
         method_name = self.input_add_new_method.text()
-        # self.methods_combo_box.itemData()
-        self.admin_worker.insert_method(method_name)
+        current_methods = self.method_cb_model.stringList()
+        try:
+            self.admin_worker.insert_method(method_name, current_methods)
+        except AdminException as e:
+            self._show_error_message(e)
+            return
         self._init_methods_combo_box()
+        self._show_good_message()
 
-    # TODO: сообщение о удачном или неудачном удалении
     def _delete_button_clicked(self):
         content = self.methods_combo_box.currentText()
         try:
             self.admin_worker.delete_method(content)
         except AdminException as e:
-            self._show_message_nelder_mead(e)
+            self._show_error_message(e)
+            return
         self._init_methods_combo_box()
+        self._show_good_message()
 
     def _methods_combo_box_changed(self):
         content = self.methods_combo_box.currentText()
@@ -88,11 +97,18 @@ class AdminWindow(QWidget):
         else:
             self.add_button.setEnabled(False)
 
-    def _show_message_nelder_mead(self, e):
+    def _show_error_message(self, e):
         dlg = QMessageBox(self)
         dlg.setWindowTitle("Ошибка!")
         dlg.setIcon(QMessageBox.Icon.Critical)
         dlg.setText(str(e))
+        dlg.exec()
+
+    def _show_good_message(self):
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("Ошибка!")
+        dlg.setIcon(QMessageBox.Icon.Information)
+        dlg.setText('Операция прошла успешно!')
         dlg.exec()
 
 

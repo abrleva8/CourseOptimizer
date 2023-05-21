@@ -1,6 +1,7 @@
 import database
 
 from exceptions import NelderMeadException
+from exceptions import SameMethodException
 
 
 class AdminWorker:
@@ -10,7 +11,9 @@ class AdminWorker:
     def get_methods(self):
         return self.admin_bd.get_methods()
 
-    def insert_method(self, name):
+    def insert_method(self, name, elements):
+        if name in elements:
+            raise SameMethodException(name)
         self.admin_bd.insert_method(name)
 
     def delete_method(self, name):
