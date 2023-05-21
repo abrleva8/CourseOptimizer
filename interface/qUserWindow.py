@@ -56,8 +56,8 @@ class UserWindow(QMainWindow):
         self.ok_button.clicked.connect(self._start_clicked)
         self.ok_button.setEnabled(True)
 
-        self.founded_optimum_point = QLabel("Точка минимума: ", self)
-        self.founded_optimum_value = QLabel("Найденный минимум: ", self)
+        self.founded_optimum_point = QLabel("Точка максимума: ", self)
+        self.founded_optimum_value = QLabel("Найденный максимум: ", self)
 
         self.canvas = MplCanvas(width=4, height=4, dpi=100)
 
@@ -120,7 +120,7 @@ class UserWindow(QMainWindow):
 
         self.minimum_point_3d = self.canvas.ax_2.scatter(
             self.optimizer.get_min_point().x, self.optimizer.get_min_point().y, self.optimizer.get_min_value(),
-            color='black', marker='o', label='Найденный минимум')
+            color='black', marker='o', label='Найденный максимум')
 
         self.canvas.ax_2.set_xlim(self.optimizer.get_x_min_max())
         self.canvas.ax_2.set_ylim(self.optimizer.get_y_min_max())
