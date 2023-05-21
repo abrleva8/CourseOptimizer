@@ -1,9 +1,10 @@
 import sys
 
-from PyQt6.QtWidgets import QWidget, QApplication, QComboBox, QPushButton, QGridLayout, QLineEdit
+from PyQt6.QtWidgets import QWidget, QApplication, QComboBox, QPushButton, QGridLayout, QLineEdit, QMessageBox
 from PyQt6 import QtGui
 
 import logic
+from exceptions import AdminException
 
 
 class AdminWindow(QWidget):
@@ -67,7 +68,10 @@ class AdminWindow(QWidget):
     # TODO: сообщение о удачном или неудачном удалении
     def _delete_button_clicked(self):
         content = self.methods_combo_box.currentText()
-        self.admin_worker.delete_method(content)
+        try:
+            self.admin_worker.delete_method(content)
+        except AdminException as e:
+            self._show_message_nelder_mead(e)
         self._init_methods_combo_box()
 
     def _methods_combo_box_changed(self):
@@ -83,6 +87,13 @@ class AdminWindow(QWidget):
             self.add_button.setEnabled(True)
         else:
             self.add_button.setEnabled(False)
+
+    def _show_message_nelder_mead(self, e):
+        dlg = QMessageBox(self)
+        dlg.setWindowTitle("Ошибка!")
+        dlg.setIcon(QMessageBox.Icon.Critical)
+        dlg.setText(str(e))
+        dlg.exec()
 
 
 if __name__ == '__main__':

@@ -1,4 +1,4 @@
-from exceptions import loginException
+from exceptions import login_exception
 from users.user import User
 
 
@@ -9,7 +9,7 @@ class UserWorker:
     def get_login(self):
         try:
             res = self.user.get_data()
-        except loginException.LoginException as e:
+        except login_exception.LoginException as e:
             raise e
 
         return res

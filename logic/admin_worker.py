@@ -1,5 +1,7 @@
 import database
 
+from exceptions import NelderMeadException
+
 
 class AdminWorker:
     def __init__(self):
@@ -12,6 +14,8 @@ class AdminWorker:
         self.admin_bd.insert_method(name)
 
     def delete_method(self, name):
+        if name == 'Метод Нелдер - Мида':
+            raise NelderMeadException(name)
         self.admin_bd.delete_method(name)
 
 

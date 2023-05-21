@@ -1,4 +1,4 @@
-from exceptions import loginException
+from exceptions import login_exception
 
 
 class User:
@@ -13,7 +13,7 @@ class User:
                 login, password = map(str.rstrip, line.split(','))
                 if login.__eq__(self.login):
                     if not password.__eq__(self.password):
-                        raise loginException.BadPasswordException(self.login)
+                        raise login_exception.BadPasswordException(self.login)
                     else:
                         return self.login
-            raise loginException.NotSuchUserException(self.login)
+            raise login_exception.NotSuchUserException(self.login)
