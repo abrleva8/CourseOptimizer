@@ -3,12 +3,13 @@ import sys
 import matplotlib
 from PyQt6 import QtCore
 from PyQt6.QtGui import QAction
-from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QGridLayout, QLabel, QHBoxLayout, QLineEdit
+from PyQt6.QtWidgets import QMainWindow, QApplication, QPushButton, QWidget, QGridLayout, QLabel, QHBoxLayout, \
+    QLineEdit, QComboBox
 from PyQt6.QtWidgets import QToolBar
 from matplotlib import cm
 
-from interface import qDialogInfo, qLoginWindow
-from logic import Optimizer
+from interface import qDialogInfo, qLoginWindow, qAdminWindow
+from logic import Optimizer, AdminWorker
 from plotting.mpl_canvas import MplCanvas
 
 matplotlib.use('QtAgg')
@@ -46,6 +47,10 @@ class UserWindow(QMainWindow):
         button_change_user.triggered.connect(self._change_user)
         toolbar.addAction(button_change_user)
 
+        self.label_methods = QLabel("Доступные методы")
+        self.methods_combo_box = QComboBox()
+        self.methods_combo_box.currentTextChanged.connect(self._method_combo_box_changed)
+
         self.label_count_iteration = QLabel("Число итерации")
 
         self.input_count_iteration = QLineEdit("10")
@@ -58,6 +63,9 @@ class UserWindow(QMainWindow):
 
         self.founded_optimum_point = QLabel("Точка максимума: ", self)
         self.founded_optimum_value = QLabel("Найденный максимум: ", self)
+        self.founded_optimum_value_product = QLabel("Максимальный выход целевого\nкомпонента в кг за рабочую смену: ",
+                                                    self)
+        self.optimum_value_product = QLabel(self)
 
         self.canvas = MplCanvas(width=4, height=4, dpi=100)
 
@@ -65,11 +73,15 @@ class UserWindow(QMainWindow):
 
         layout_left = QGridLayout()
         layout_right = QGridLayout()
-        layout_left.addWidget(self.label_count_iteration, 0, 0)
-        layout_left.addWidget(self.input_count_iteration, 0, 1)
-        layout_left.addWidget(self.ok_button, 1, 0)
-        layout_left.addWidget(self.founded_optimum_point, 2, 0)
-        layout_left.addWidget(self.founded_optimum_value, 3, 0)
+        layout_left.addWidget(self.label_methods, 0, 0)
+        layout_left.addWidget(self.methods_combo_box, 0, 1)
+        layout_left.addWidget(self.label_count_iteration, 1, 0)
+        layout_left.addWidget(self.input_count_iteration, 1, 1)
+        layout_left.addWidget(self.ok_button, 2, 0)
+        layout_left.addWidget(self.founded_optimum_point, 3, 0)
+        layout_left.addWidget(self.founded_optimum_value, 4, 0)
+        layout_left.addWidget(self.founded_optimum_value_product, 5, 0)
+        layout_left.addWidget(self.optimum_value_product, 5, 1)
         layout_right.addWidget(self.canvas)
 
         layout_t.addLayout(layout_left, 0)
@@ -79,6 +91,7 @@ class UserWindow(QMainWindow):
         widget.setLayout(layout_t)
 
         self.setCentralWidget(widget)
+        self._get_methods()
 
     def update_plot(self):
         points = self.optimizer.get_points()
@@ -95,7 +108,7 @@ class UserWindow(QMainWindow):
         self.canvas.ax_1.set_ylim(self.optimizer.get_y_min_max())
         self.canvas.ax_1.set_xlabel('Компонента A1')
         self.canvas.ax_1.set_ylabel('Компонента A2')
-        self.canvas.ax_1.set_title('График линии равных значений объема расхода компонентов')
+        self.canvas.ax_1.set_title('График линии равных значений выхода продукта')
         self.canvas.ax_1.plot(self.optimizer.get_min_point().x, self.optimizer.get_min_point().y,
                               color='gray', marker='o', label='Найденный максимум')
         cntr = self.canvas.ax_1.contourf(*self.optimizer.get_limits(), levels=50, cmap=cm.coolwarm)
@@ -124,10 +137,10 @@ class UserWindow(QMainWindow):
 
         self.canvas.ax_2.set_xlim(self.optimizer.get_x_min_max())
         self.canvas.ax_2.set_ylim(self.optimizer.get_y_min_max())
-        self.canvas.ax_2.set_title('График зависимости объема расхода от компонентов A1 и A2')
+        self.canvas.ax_2.set_title('График зависимости выхода продукта от компонентов A1 и A2')
         self.canvas.ax_2.set_xlabel('Компонент A1')
         self.canvas.ax_2.set_ylabel('Компонент A2')
-        self.canvas.ax_2.set_zlabel('Расход компонента за смену')
+        self.canvas.ax_2.set_zlabel('Выход компонента за час')
         self.canvas.ax_2.legend()
 
         self.canvas.cbar_2 = self.canvas.fig.colorbar(surf, fraction=0.03, pad=0.1)
@@ -143,9 +156,8 @@ class UserWindow(QMainWindow):
         self.login_window.show()
         self.close()
 
-    # TODO: добавить формализированное описание задания
     # TODO: симплекс метод - добавить методов
-    
+
     def _start_clicked(self):
         self.timer = QtCore.QTimer()
         self.timer.setInterval(1000)
@@ -156,11 +168,27 @@ class UserWindow(QMainWindow):
         self.optimizer = Optimizer(max_iter=count_iteration)
         self.update_plot()
         self.plot_3d()
-        self.founded_optimum_point.setText('Точка минимума: ' + repr(self.optimizer.get_min_point()))
-        self.founded_optimum_value.setText(f'Найденный минимум: {self.optimizer.get_min_value():.2f}')
+        min_value = self.optimizer.get_min_value()
+        self.founded_optimum_point.setText('Точка максимума: ' + repr(self.optimizer.get_min_point()))
+        self.founded_optimum_value.setText(f'Найденный максимум: {min_value:.2f}')
+        self.optimum_value_product.setText(f'{8 * min_value:.2f} кг')
 
     def _get_count_iteration(self):
         return int(self.input_count_iteration.text())
+
+    def _get_methods(self):
+        admin_worker = AdminWorker()
+        list_of_methods = admin_worker.get_methods()
+        name_of_methods = list(map(lambda x: x[0], list_of_methods))
+        self.methods_combo_box.clear()
+        self.methods_combo_box.addItems(name_of_methods)
+
+    def _method_combo_box_changed(self):
+        text = self.methods_combo_box.currentText()
+        if text == 'Метод Нелдер - Мида':
+            self.ok_button.setEnabled(True)
+        else:
+            self.ok_button.setEnabled(False)
 
 
 if __name__ == '__main__':

@@ -3,7 +3,7 @@ import sys
 from PyQt6.QtCore import QStringListModel
 from PyQt6.QtGui import QAction
 from PyQt6.QtWidgets import QWidget, QApplication, QComboBox, QPushButton, QGridLayout, QLineEdit, QMessageBox, \
-    QToolBar, QMainWindow, QSizePolicy
+    QToolBar, QMainWindow, QSizePolicy, QTabWidget, QMenuBar
 from PyQt6 import QtGui
 
 import logic
@@ -11,28 +11,63 @@ from exceptions import AdminException
 from interface import qLoginWindow
 
 
-class AdminWindow(QWidget):
+class AdminWindow(QMainWindow):
     def __init__(self):
         super().__init__()
         self.setWindowTitle("Окно администратора")
         self.admin_worker = logic.AdminWorker()
         self.setFixedSize(300, 150)
 
-        self.toolbar = QToolBar("d", self)
+        menubar = self.menuBar()
+        file_menu = menubar.addMenu('Файл')
+        change_user = QAction('Сменить пользователя', self)
+        change_user.triggered.connect(self._change_user)
+        file_menu.addAction(change_user)
 
-        button_action = QAction("Сменить пользователя", self)
-        button_action.setToolTip("Смена пользователя")
-        button_action.triggered.connect(self._change_user)
-        self.toolbar.addAction(button_action)
+        self.tabs = QTabWidget()
+        self.setCentralWidget(self.tabs)
 
-        layout = self._get_layout()
-        self.setLayout(layout)
+        self.tab_methods = QWidget()
+        self._tab_methods_layout()
+        self.tab_variations = QWidget()
+        self._tab_variations_layout()
+
+        self.tabs.addTab(self.tab_methods, "Методы")
+        self.tabs.addTab(self.tab_variations, "Варианты")
+
+        self.show()
 
         self._init_methods_combo_box()
-
         self._center()
 
-    def _get_layout(self):
+    def _tab_variations_layout(self):
+        layout = QGridLayout()
+
+        self.variations_combo_box = QComboBox(self)
+        self.variation_cb_model = QStringListModel()
+        self.variations_combo_box.setModel(self.variation_cb_model)
+        self.variations_combo_box.currentTextChanged.connect(self._variations_combo_box_changed)
+        layout.addWidget(self.variations_combo_box, 0, 0)
+
+        self.delete_button_variation = QPushButton(self)
+        self.delete_button_variation.setText("Удалить вариант")
+        self.delete_button_variation.setEnabled(False)
+        self.delete_button_variation.clicked.connect(self._delete_variation_btn_clicked)
+        layout.addWidget(self.delete_button_variation, 0, 1)
+
+        self.input_add_new_variation = QLineEdit("")
+        self.input_add_new_variation.setPlaceholderText('Введите новый вариант')
+        self.input_add_new_variation.textChanged.connect(self._input_add_new_variation_changed)
+        layout.addWidget(self.input_add_new_variation, 1, 0)
+
+        self.add_variation_button = QPushButton(self)
+        self.add_variation_button.setText("Добавить вариант")
+        self.add_variation_button.setEnabled(False)
+        layout.addWidget(self.add_variation_button, 1, 1)
+        self.add_variation_button.clicked.connect(self._add_variation_button_clicked)
+        self.tab_variations.setLayout(layout)
+
+    def _tab_methods_layout(self):
         layout = QGridLayout()
 
         self.methods_combo_box = QComboBox(self)
@@ -47,10 +82,10 @@ class AdminWindow(QWidget):
         self.delete_button.clicked.connect(self._delete_button_clicked)
         layout.addWidget(self.delete_button, 0, 1)
 
-        self.input_add_new_method = QLineEdit("")
-        self.input_add_new_method.setPlaceholderText('Введите новый метод')
-        self.input_add_new_method.textChanged.connect(self._input_add_new_method_changed)
-        layout.addWidget(self.input_add_new_method, 1, 0)
+        self.input_add_new_variation = QLineEdit("")
+        self.input_add_new_variation.setPlaceholderText('Введите новый метод')
+        self.input_add_new_variation.textChanged.connect(self._input_add_new_method_changed)
+        layout.addWidget(self.input_add_new_variation, 1, 0)
 
         self.add_button = QPushButton(self)
         self.add_button.setText("Добавить метод")
@@ -58,7 +93,7 @@ class AdminWindow(QWidget):
         layout.addWidget(self.add_button, 1, 1)
         self.add_button.clicked.connect(self._add_button_clicked)
 
-        return layout
+        self.tab_methods.setLayout(layout)
 
     def _center(self):
         qr = self.frameGeometry()
@@ -78,7 +113,7 @@ class AdminWindow(QWidget):
         self.methods_combo_box.addItems(name_of_methods)
 
     def _add_button_clicked(self):
-        method_name = self.input_add_new_method.text()
+        method_name = self.input_add_new_variation.text()
         current_methods = self.method_cb_model.stringList()
         try:
             self.admin_worker.insert_method(method_name, current_methods)
@@ -87,6 +122,9 @@ class AdminWindow(QWidget):
             return
         self._init_methods_combo_box()
         self._show_good_message()
+
+    def _add_variation_button_clicked(self):
+        pass
 
     def _delete_button_clicked(self):
         content = self.methods_combo_box.currentText()
@@ -98,6 +136,9 @@ class AdminWindow(QWidget):
         self._init_methods_combo_box()
         self._show_good_message()
 
+    def _delete_variation_btn_clicked(self):
+        pass
+
     def _methods_combo_box_changed(self):
         content = self.methods_combo_box.currentText()
         if content:
@@ -105,12 +146,18 @@ class AdminWindow(QWidget):
         else:
             self.delete_button.setEnabled(False)
 
+    def _variations_combo_box_changed(self):
+        pass
+
     def _input_add_new_method_changed(self):
-        content = self.input_add_new_method.text()
+        content = self.input_add_new_variation.text()
         if content:
             self.add_button.setEnabled(True)
         else:
             self.add_button.setEnabled(False)
+
+    def _input_add_new_variation_changed(self):
+        pass
 
     def _show_error_message(self, e):
         dlg = QMessageBox(self)

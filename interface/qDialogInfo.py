@@ -21,7 +21,7 @@ text = "Объектом оптимизации является химико-т
        "Точность решения -0,01 м^3/ч."
 
 
-class QDialogInfo(QWidget):
+class QDialogInfo(QDialog):
 
     def __init__(self, parent=None):
         super().__init__(parent)
@@ -38,8 +38,6 @@ class QDialogInfo(QWidget):
         self.label_img.setPixmap(pixmap)
         layout.addWidget(self.program_info, 0)
         layout.addWidget(self.label_img, 1)
-        # widget = QWidget()
-        # widget.setLayout(layout)
         self.setLayout(layout)
 
 
