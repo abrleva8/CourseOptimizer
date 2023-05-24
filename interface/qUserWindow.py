@@ -51,6 +51,10 @@ class UserWindow(QMainWindow):
         self.methods_combo_box = QComboBox()
         self.methods_combo_box.currentTextChanged.connect(self._method_combo_box_changed)
 
+        self.label_variations = QLabel("Доступные варианты")
+        self.variations_combo_box = QComboBox()
+        self.variations_combo_box.currentTextChanged.connect(self._variation_combo_box_changed)
+
         self.label_count_iteration = QLabel("Число итерации")
 
         self.input_count_iteration = QLineEdit("10")
@@ -75,13 +79,15 @@ class UserWindow(QMainWindow):
         layout_right = QGridLayout()
         layout_left.addWidget(self.label_methods, 0, 0)
         layout_left.addWidget(self.methods_combo_box, 0, 1)
-        layout_left.addWidget(self.label_count_iteration, 1, 0)
-        layout_left.addWidget(self.input_count_iteration, 1, 1)
-        layout_left.addWidget(self.ok_button, 2, 0)
-        layout_left.addWidget(self.founded_optimum_point, 3, 0)
-        layout_left.addWidget(self.founded_optimum_value, 4, 0)
-        layout_left.addWidget(self.founded_optimum_value_product, 5, 0)
-        layout_left.addWidget(self.optimum_value_product, 5, 1)
+        layout_left.addWidget(self.label_variations, 1, 0)
+        layout_left.addWidget(self.variations_combo_box, 1, 1)
+        layout_left.addWidget(self.label_count_iteration, 2, 0)
+        layout_left.addWidget(self.input_count_iteration, 2, 1)
+        layout_left.addWidget(self.ok_button, 3, 0)
+        layout_left.addWidget(self.founded_optimum_point, 4, 0)
+        layout_left.addWidget(self.founded_optimum_value, 5, 0)
+        layout_left.addWidget(self.founded_optimum_value_product, 6, 0)
+        layout_left.addWidget(self.optimum_value_product, 6, 1)
         layout_right.addWidget(self.canvas)
 
         layout_t.addLayout(layout_left, 0)
@@ -92,6 +98,7 @@ class UserWindow(QMainWindow):
 
         self.setCentralWidget(widget)
         self._get_methods()
+        self._get_variations()
 
     def update_plot(self):
         points = self.optimizer.get_points()
@@ -183,9 +190,23 @@ class UserWindow(QMainWindow):
         self.methods_combo_box.clear()
         self.methods_combo_box.addItems(name_of_methods)
 
+    def _get_variations(self):
+        admin_worker = AdminWorker()
+        list_of_variations = admin_worker.get_variations()
+        name_of_variations = list(map(lambda x: x[0], list_of_variations))
+        self.variations_combo_box.clear()
+        self.variations_combo_box.addItems(name_of_variations)
+
     def _method_combo_box_changed(self):
         text = self.methods_combo_box.currentText()
         if text == 'Метод Нелдер - Мида':
+            self.ok_button.setEnabled(True)
+        else:
+            self.ok_button.setEnabled(False)
+
+    def _variation_combo_box_changed(self):
+        text = self.variations_combo_box.currentText()
+        if text == 'Абрамян':
             self.ok_button.setEnabled(True)
         else:
             self.ok_button.setEnabled(False)

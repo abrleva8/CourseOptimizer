@@ -38,6 +38,7 @@ class AdminWindow(QMainWindow):
         self.show()
 
         self._init_methods_combo_box()
+        self._init_variations_combo_box()
         self._center()
 
     def _tab_variations_layout(self):
@@ -82,10 +83,10 @@ class AdminWindow(QMainWindow):
         self.delete_button.clicked.connect(self._delete_button_clicked)
         layout.addWidget(self.delete_button, 0, 1)
 
-        self.input_add_new_variation = QLineEdit("")
-        self.input_add_new_variation.setPlaceholderText('Введите новый метод')
-        self.input_add_new_variation.textChanged.connect(self._input_add_new_method_changed)
-        layout.addWidget(self.input_add_new_variation, 1, 0)
+        self.input_add_new_methods = QLineEdit("")
+        self.input_add_new_methods.setPlaceholderText('Введите новый метод')
+        self.input_add_new_methods.textChanged.connect(self._input_add_new_method_changed)
+        layout.addWidget(self.input_add_new_methods, 1, 0)
 
         self.add_button = QPushButton(self)
         self.add_button.setText("Добавить метод")
@@ -112,8 +113,14 @@ class AdminWindow(QMainWindow):
         self.methods_combo_box.clear()
         self.methods_combo_box.addItems(name_of_methods)
 
+    def _init_variations_combo_box(self):
+        list_of_variations = self.admin_worker.get_variations()
+        name_of_variations = list(map(lambda x: x[0], list_of_variations))
+        self.variations_combo_box.clear()
+        self.variations_combo_box.addItems(name_of_variations)
+
     def _add_button_clicked(self):
-        method_name = self.input_add_new_variation.text()
+        method_name = self.input_add_new_methods.text()
         current_methods = self.method_cb_model.stringList()
         try:
             self.admin_worker.insert_method(method_name, current_methods)
@@ -124,7 +131,15 @@ class AdminWindow(QMainWindow):
         self._show_good_message()
 
     def _add_variation_button_clicked(self):
-        pass
+        variation_name = self.input_add_new_variation.text()
+        current_variation = self.variation_cb_model.stringList()
+        try:
+            self.admin_worker.insert_variation(variation_name, current_variation)
+        except AdminException as e:
+            self._show_error_message(e)
+            return
+        self._init_variations_combo_box()
+        self._show_good_message()
 
     def _delete_button_clicked(self):
         content = self.methods_combo_box.currentText()
@@ -137,7 +152,14 @@ class AdminWindow(QMainWindow):
         self._show_good_message()
 
     def _delete_variation_btn_clicked(self):
-        pass
+        content = self.variations_combo_box.currentText()
+        try:
+            self.admin_worker.delete_variation(content)
+        except AdminException as e:
+            self._show_error_message(e)
+            return
+        self._init_variations_combo_box()
+        self._show_good_message()
 
     def _methods_combo_box_changed(self):
         content = self.methods_combo_box.currentText()
@@ -147,17 +169,25 @@ class AdminWindow(QMainWindow):
             self.delete_button.setEnabled(False)
 
     def _variations_combo_box_changed(self):
-        pass
+        content = self.variations_combo_box.currentText()
+        if content:
+            self.delete_button_variation.setEnabled(True)
+        else:
+            self.delete_button_variation.setEnabled(False)
 
     def _input_add_new_method_changed(self):
-        content = self.input_add_new_variation.text()
+        content = self.input_add_new_methods.text()
         if content:
             self.add_button.setEnabled(True)
         else:
             self.add_button.setEnabled(False)
 
     def _input_add_new_variation_changed(self):
-        pass
+        content = self.input_add_new_variation.text()
+        if content:
+            self.add_variation_button.setEnabled(True)
+        else:
+            self.add_variation_button.setEnabled(False)
 
     def _show_error_message(self, e):
         dlg = QMessageBox(self)

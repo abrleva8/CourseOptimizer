@@ -5,26 +5,26 @@ class DataBaseWorker:
     def __init__(self):
         self.connector = mysql.connector
 
-    def get_methods(self) -> list:
+    def get(self, col_name, table_name) -> list:
         self._connect()
         my_cursor = self.connection.cursor()
-        my_cursor.execute("SELECT name, available FROM method")
+        my_cursor.execute(f"SELECT {col_name} FROM {table_name}")
         result = my_cursor.fetchall()
         self.connection.close()
         return result
 
-    def insert_method(self, name):
+    def insert(self, name, table):
         self._connect()
         my_cursor = self.connection.cursor()
-        query = f'INSERT method(name) VALUES ("{name}");'
+        query = f'INSERT {table}(name) VALUES ("{name}");'
         my_cursor.execute(query)
         self.connection.commit()
         self.connection.close()
 
-    def delete_method(self, name):
+    def delete(self, name, table):
         self._connect()
         my_cursor = self.connection.cursor()
-        query = f'DELETE FROM method WHERE name="{name}";'
+        query = f'DELETE FROM {table} WHERE name="{name}";'
         my_cursor.execute(query)
         self.connection.commit()
         self.connection.close()
@@ -41,4 +41,4 @@ class DataBaseWorker:
 
 if __name__ == '__main__':
     db = DataBaseWorker()
-    a = db.get_methods()
+    # a = db.get_methods()
