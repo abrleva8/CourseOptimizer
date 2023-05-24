@@ -9,6 +9,7 @@ from PyQt6.QtWidgets import QToolBar
 from matplotlib import cm
 
 from interface import qDialogInfo, qLoginWindow, qAdminWindow
+from interface.qTableWindow import MyTableView
 from logic import Optimizer, AdminWorker
 from plotting.mpl_canvas import MplCanvas
 
@@ -61,9 +62,13 @@ class UserWindow(QMainWindow):
         self.input_count_iteration.setPlaceholderText('Введите число итерации')
         self.input_count_iteration.setInputMask("d0")
 
-        self.ok_button = QPushButton("Нарисовать графики", self)
-        self.ok_button.clicked.connect(self._start_clicked)
-        self.ok_button.setEnabled(True)
+        self.calculate_button = QPushButton("Нарисовать графики", self)
+        self.calculate_button.clicked.connect(self._start_clicked)
+        self.calculate_button.setEnabled(True)
+
+        self.show_table_button = QPushButton("Показать точки", self)
+        self.show_table_button.clicked.connect(self._show_table_clicked)
+        self.show_table_button.setEnabled(False)
 
         self.founded_optimum_point = QLabel("Точка максимума: ", self)
         self.founded_optimum_value = QLabel("Найденный максимум: ", self)
@@ -83,11 +88,12 @@ class UserWindow(QMainWindow):
         layout_left.addWidget(self.variations_combo_box, 1, 1)
         layout_left.addWidget(self.label_count_iteration, 2, 0)
         layout_left.addWidget(self.input_count_iteration, 2, 1)
-        layout_left.addWidget(self.ok_button, 3, 0)
-        layout_left.addWidget(self.founded_optimum_point, 4, 0)
-        layout_left.addWidget(self.founded_optimum_value, 5, 0)
-        layout_left.addWidget(self.founded_optimum_value_product, 6, 0)
-        layout_left.addWidget(self.optimum_value_product, 6, 1)
+        layout_left.addWidget(self.calculate_button, 3, 0)
+        layout_left.addWidget(self.show_table_button, 4, 0)
+        layout_left.addWidget(self.founded_optimum_point, 5, 0)
+        layout_left.addWidget(self.founded_optimum_value, 6, 0)
+        layout_left.addWidget(self.founded_optimum_value_product, 7, 0)
+        layout_left.addWidget(self.optimum_value_product, 7, 1)
         layout_right.addWidget(self.canvas)
 
         layout_t.addLayout(layout_left, 0)
@@ -163,7 +169,9 @@ class UserWindow(QMainWindow):
         self.login_window.show()
         self.close()
 
-    # TODO: симплекс метод - добавить методов
+    def _show_table_clicked(self):
+        data = self.optimizer.get_points()
+        self.window = MyTableView(data, self.count_iteration, 3)
 
     def _start_clicked(self):
         self.timer = QtCore.QTimer()
@@ -171,14 +179,15 @@ class UserWindow(QMainWindow):
         self.timer.timeout.connect(self.update_plot)
         self.timer.start()
 
-        count_iteration = self._get_count_iteration()
-        self.optimizer = Optimizer(max_iter=count_iteration)
+        self.count_iteration = self._get_count_iteration()
+        self.optimizer = Optimizer(max_iter=self.count_iteration)
         self.update_plot()
         self.plot_3d()
         min_value = self.optimizer.get_min_value()
         self.founded_optimum_point.setText('Точка максимума: ' + repr(self.optimizer.get_min_point()))
         self.founded_optimum_value.setText(f'Найденный максимум: {min_value:.2f}')
         self.optimum_value_product.setText(f'{8 * min_value:.2f} кг')
+        self.show_table_button.setEnabled(True)
 
     def _get_count_iteration(self):
         return int(self.input_count_iteration.text())
@@ -200,16 +209,16 @@ class UserWindow(QMainWindow):
     def _method_combo_box_changed(self):
         text = self.methods_combo_box.currentText()
         if text == 'Метод Нелдер - Мида':
-            self.ok_button.setEnabled(True)
+            self.calculate_button.setEnabled(True)
         else:
-            self.ok_button.setEnabled(False)
+            self.calculate_button.setEnabled(False)
 
     def _variation_combo_box_changed(self):
         text = self.variations_combo_box.currentText()
         if text == 'Абрамян':
-            self.ok_button.setEnabled(True)
+            self.calculate_button.setEnabled(True)
         else:
-            self.ok_button.setEnabled(False)
+            self.calculate_button.setEnabled(False)
 
 
 if __name__ == '__main__':

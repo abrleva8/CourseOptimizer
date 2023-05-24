@@ -49,8 +49,6 @@ class Function:
         y = np.ma.masked_array(y, ~mask)
         return x, y
 
-    # TODO: сделать задания (неработающие)
-    # TODO: поменять целевую функцию *8
     # TODO: выводить треугольники
     # TODO: alpha beta gamme
     def nelder_mead(self, alpha=0.5, beta=0.5, gamma=2, max_iter=10) -> point:
